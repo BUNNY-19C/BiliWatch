@@ -31,7 +31,8 @@ public sealed class MainViewModel : Observable, IDisposable
     public bool HasRows => Anchors.Count > 0;
     public bool Empty => !HasRows;
     public bool HasRanking => Ranking.Count > 0;
-    public string Search { get => search; set { if (Set(ref search, value)) Rows.Refresh(); } }
+    public bool NoSearchResults => HasRows && !string.IsNullOrWhiteSpace(Search) && Rows.IsEmpty;
+    public string Search { get => search; set { if (Set(ref search, value)) { Rows.Refresh(); Raise(nameof(NoSearchResults)); } } }
     public string ManualUid { get => manualUid; set => Set(ref manualUid, value); }
     public string Hours => (totals.Seconds / 3600d).ToString("N2");
     public string ExactDuration => Anchor.FormatDuration(totals.Seconds);
@@ -51,6 +52,7 @@ public sealed class MainViewModel : Observable, IDisposable
     public MainViewModel()
     {
         Rows = CollectionViewSource.GetDefaultView(Anchors);
+        Rows.CollectionChanged += (_, _) => Raise(nameof(NoSearchResults));
         Rows.SortDescriptions.Add(new(nameof(Anchor.LastSeconds), ListSortDirection.Descending));
         Rows.Filter = obj => obj is Anchor a && (string.IsNullOrWhiteSpace(Search) || a.Name.Contains(Search, StringComparison.CurrentCultureIgnoreCase) || a.Uid.ToString().Contains(Search));
         LoginCommand = new AsyncCommand(LoginAsync, ShowError, () => !Busy);
