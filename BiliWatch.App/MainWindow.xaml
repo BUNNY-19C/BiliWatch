@@ -1,0 +1,61 @@
+<Window x:Class="BiliWatch.App.MainWindow" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" Title="BiliWatch · 直播观看时长" Width="1280" Height="880" MinWidth="1000" MinHeight="720" WindowStartupLocation="CenterScreen">
+  <Grid Margin="28,22,28,20">
+    <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="*"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+    <Grid Margin="0,0,0,20">
+      <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+      <StackPanel><TextBlock Text="BiliWatch" FontSize="28" FontWeight="Bold"/><TextBlock Text="你的直播观看记录，一目了然。" Style="{StaticResource Caption}" Margin="0,4,0,0"/></StackPanel>
+      <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+        <StackPanel VerticalAlignment="Center" Margin="0,0,16,0"><TextBlock Text="{Binding AccountText}" HorizontalAlignment="Right" FontWeight="SemiBold"/><TextBlock Text="{Binding LoginText}" Style="{StaticResource Caption}" Margin="0,5,0,0" HorizontalAlignment="Right"/></StackPanel>
+        <Button Content="扫码登录" Command="{Binding LoginCommand}"/><Button Content="退出" Command="{Binding LogoutCommand}" Margin="0"/>
+      </StackPanel>
+    </Grid>
+    <Grid Grid.Row="1" Margin="0,0,0,16">
+      <Grid.ColumnDefinitions><ColumnDefinition Width="2.2*"/><ColumnDefinition Width="*"/><ColumnDefinition Width="*"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+      <Border Style="{StaticResource Card}" Background="#172F55" BorderBrush="#172F55" Margin="0,0,12,0">
+        <StackPanel><TextBlock Text="本次成功查询合计" Foreground="#C7D8F1"/><StackPanel Orientation="Horizontal" Margin="0,8,0,4"><TextBlock Text="{Binding Hours}" Foreground="White" FontSize="38" FontWeight="SemiBold"/><TextBlock Text="小时" Foreground="#C7D8F1" VerticalAlignment="Bottom" Margin="10,0,0,8"/></StackPanel><TextBlock Text="{Binding ExactDuration}" Foreground="#C7D8F1" FontSize="12"/></StackPanel>
+      </Border>
+      <Border Grid.Column="1" Style="{StaticResource Card}" Margin="0,0,12,0"><StackPanel><TextBlock Text="查询成功" Style="{StaticResource Caption}"/><TextBlock Text="{Binding SuccessCount}" FontSize="36" FontWeight="SemiBold" Margin="0,10,0,4"/><TextBlock Text="计入本轮统计" Style="{StaticResource Caption}"/></StackPanel></Border>
+      <Border Grid.Column="2" Style="{StaticResource Card}" Margin="0,0,12,0"><StackPanel><TextBlock Text="查询失败" Style="{StaticResource Caption}"/><TextBlock Text="{Binding FailedCount}" Foreground="#B45309" FontSize="36" FontWeight="SemiBold" Margin="0,10,0,4"/><TextBlock Text="可单独重试" Style="{StaticResource Caption}"/></StackPanel></Border>
+      <Border Grid.Column="3" Style="{StaticResource Card}"><StackPanel><TextBlock Text="等待查询" Style="{StaticResource Caption}"/><TextBlock Text="{Binding PendingCount}" FontSize="36" FontWeight="SemiBold" Margin="0,10,0,4"/><TextBlock Text="包含正在查询项" Style="{StaticResource Caption}"/></StackPanel></Border>
+    </Grid>
+    <StackPanel Grid.Row="2" Margin="0,0,0,14">
+      <TextBlock Text="仅覆盖已发现主播，统计起点以 B 站接口为准。旧结果保留在明细中，不计入新一轮合计。" Style="{StaticResource Caption}" TextWrapping="Wrap" Margin="0,0,0,14"/>
+      <WrapPanel><Button Content="开始查询" Style="{StaticResource Primary}" Command="{Binding StartCommand}"/><Button Content="取消" Command="{Binding CancelCommand}"/><Button Content="重试失败项" Command="{Binding RetryCommand}"/><Button Content="继续待查询项" Command="{Binding ResumeCommand}"/><TextBox Width="198" Text="{Binding ManualUid, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding CanEdit}" ToolTip="主播个人空间的数字 UID，多个用逗号分隔" AutomationProperties.Name="补充主播 UID" Margin="8,0,8,0"/><Button Content="补充 UID" Command="{Binding AddCommand}" Margin="0"/></WrapPanel>
+    </StackPanel>
+    <Border Grid.Row="3" Style="{StaticResource Card}" Padding="16,10" Margin="0,0,0,16">
+      <Grid><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+        <ItemsControl ItemsSource="{Binding Sources}"><ItemsControl.ItemsPanel><ItemsPanelTemplate><WrapPanel/></ItemsPanelTemplate></ItemsControl.ItemsPanel><ItemsControl.ItemTemplate><DataTemplate><StackPanel Orientation="Horizontal" Margin="0,3,20,3"><TextBlock Text="{Binding Source}" FontWeight="SemiBold"/><TextBlock Text="{Binding Count, StringFormat='  {0} 位 · '}"/><TextBlock Text="{Binding State}" Foreground="{StaticResource Muted}" MaxWidth="220" TextTrimming="CharacterEllipsis" ToolTip="{Binding State}"/></StackPanel></DataTemplate></ItemsControl.ItemTemplate></ItemsControl>
+        <TextBlock Grid.Column="1" Text="{Binding ProgressText}" Style="{StaticResource Caption}" VerticalAlignment="Center" Margin="10,0,0,0"/>
+      </Grid>
+    </Border>
+    <Grid Grid.Row="4">
+      <Grid.ColumnDefinitions><ColumnDefinition Width="320"/><ColumnDefinition Width="16"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+      <Border Style="{StaticResource Card}">
+        <Grid><Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="*"/></Grid.RowDefinitions>
+          <TextBlock Text="观看时长 TOP 10" FontSize="18" FontWeight="SemiBold"/><TextBlock Grid.Row="1" Text="本轮成功结果 · 按累计时长排序" Style="{StaticResource Caption}" Margin="0,5,0,16"/>
+          <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto"><ItemsControl ItemsSource="{Binding Ranking}"><ItemsControl.ItemTemplate><DataTemplate>
+            <StackPanel Margin="0,0,0,13" ToolTip="{Binding Duration}"><Grid Margin="0,0,0,6"><Grid.ColumnDefinitions><ColumnDefinition Width="25"/><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions><TextBlock Text="{Binding Rank}" Foreground="{StaticResource Muted}"/><TextBlock Grid.Column="1" Text="{Binding Name}" TextTrimming="CharacterEllipsis" Margin="0,0,8,0"/><TextBlock Grid.Column="2" Text="{Binding Hours}" FontWeight="SemiBold"/></Grid><ProgressBar Value="{Binding Percent, Mode=OneWay}" Height="6" Maximum="100" Foreground="#3B6EE8" Background="#E8EEF8" BorderThickness="0" AutomationProperties.Name="相对观看时长"/></StackPanel>
+          </DataTemplate></ItemsControl.ItemTemplate></ItemsControl></ScrollViewer>
+          <TextBlock Grid.Row="2" Text="查询后，这里会显示你&#10;观看时间最多的主播。" Foreground="{StaticResource Muted}" TextAlignment="Center" HorizontalAlignment="Center" VerticalAlignment="Center"><TextBlock.Style><Style TargetType="TextBlock"><Setter Property="Visibility" Value="Visible"/><Style.Triggers><DataTrigger Binding="{Binding HasRanking}" Value="True"><Setter Property="Visibility" Value="Collapsed"/></DataTrigger></Style.Triggers></Style></TextBlock.Style></TextBlock>
+        </Grid>
+      </Border>
+      <Border Grid.Column="2" Style="{StaticResource Card}" Padding="18,16">
+        <Grid><Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="*"/></Grid.RowDefinitions>
+          <Grid Margin="0,0,0,14"><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="220"/></Grid.ColumnDefinitions><StackPanel VerticalAlignment="Center"><TextBlock Text="主播明细" FontSize="18" FontWeight="SemiBold"/><TextBlock Text="点击表头排序 · 鼠标悬停查看失败原因" Style="{StaticResource Caption}" FontSize="12" Margin="0,4,0,0"/></StackPanel><TextBox Grid.Column="1" Text="{Binding Search, UpdateSourceTrigger=PropertyChanged}" ToolTip="搜索主播名称或 UID" AutomationProperties.Name="搜索主播名称或 UID"/></Grid>
+          <DataGrid Grid.Row="1" ItemsSource="{Binding Rows}" AutoGenerateColumns="False" IsReadOnly="True" CanUserAddRows="False" CanUserDeleteRows="False" HeadersVisibility="Column" GridLinesVisibility="Horizontal" HorizontalGridLinesBrush="#EDF1F7" BorderThickness="0" Background="White" RowBackground="White" AlternatingRowBackground="#F8FAFD" RowHeight="48" ColumnHeaderHeight="38" EnableRowVirtualization="True" SelectionMode="Single" CanUserReorderColumns="False">
+            <DataGrid.Resources><Style TargetType="DataGridColumnHeader"><Setter Property="Background" Value="#F1F5FA"/><Setter Property="Foreground" Value="#52647B"/><Setter Property="Padding" Value="8"/><Setter Property="FontWeight" Value="SemiBold"/></Style><Style TargetType="DataGridCell"><Setter Property="BorderThickness" Value="0"/><Setter Property="Padding" Value="8,4"/><Setter Property="VerticalContentAlignment" Value="Center"/></Style><Style TargetType="DataGridRow"><Setter Property="ToolTip" Value="{Binding DetailText}"/></Style></DataGrid.Resources>
+            <DataGrid.Columns>
+              <DataGridTemplateColumn Header="主播 / UID" Width="155" SortMemberPath="Name"><DataGridTemplateColumn.CellTemplate><DataTemplate><StackPanel VerticalAlignment="Center"><TextBlock Text="{Binding Name}" TextTrimming="CharacterEllipsis"/><TextBlock Text="{Binding Uid}" FontSize="11" Foreground="#52647B"/></StackPanel></DataTemplate></DataGridTemplateColumn.CellTemplate></DataGridTemplateColumn>
+              <DataGridTextColumn Header="累计观看时长" Binding="{Binding DurationText}" SortMemberPath="LastSeconds" Width="180"/>
+              <DataGridTextColumn Header="状态" Binding="{Binding StatusText}" SortMemberPath="State" Width="90"/>
+              <DataGridTextColumn Header="发现来源" Binding="{Binding SourceText}" Width="145"/>
+              <DataGridTextColumn Header="更新时间" Binding="{Binding UpdatedText}" SortMemberPath="UpdatedAt" Width="135"/>
+            </DataGrid.Columns>
+          </DataGrid>
+          <TextBlock Grid.Row="1" Text="还没有主播记录&#10;扫码登录后点击“开始查询”，或补充主播 UID。" Visibility="{Binding Empty, Converter={StaticResource BoolVisibility}}" Foreground="{StaticResource Muted}" TextAlignment="Center" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+        </Grid>
+      </Border>
+    </Grid>
+    <StackPanel Grid.Row="5" Margin="0,15,0,0"><ProgressBar Height="4" Value="{Binding Progress, Mode=OneWay}" Maximum="100" BorderThickness="0" Foreground="#1D4ED8" Background="#DDE6F2"/><TextBlock Text="{Binding Status}" Foreground="{StaticResource Muted}" Margin="0,9,0,0" TextWrapping="Wrap" AutomationProperties.LiveSetting="Polite"/></StackPanel>
+  </Grid>
+</Window>

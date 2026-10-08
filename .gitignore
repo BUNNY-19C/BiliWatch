@@ -1,0 +1,10 @@
+.artifacts/
+bin/
+obj/
+publish/
+*.user
+session.bin
+account-*.json
+last-account.json
+live-verification*.json
+*.zip
