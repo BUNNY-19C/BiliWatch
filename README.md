@@ -33,6 +33,16 @@ BiliWatch 是一个中文 Windows 桌面工具。登录自己的 B 站账号后�
 
 ## 快速开始
 
+### 下载单文件免安装版
+
+**[下载 BiliWatch.exe（Windows x64）](https://github.com/BUNNY-19C/BiliWatch/releases/latest/download/BiliWatch.exe)** · [版本说明](https://github.com/BUNNY-19C/BiliWatch/releases/latest)
+
+下载后直接双击运行，不需要安装程序、不需要另装 .NET，也不需要配套 DLL 或解压 ZIP。EXE 已包含程序、二维码库和 .NET / WPF 运行时。
+
+首次启动时，运行时会自动将必要的本机库释放到 Windows 临时目录；账号缓存仍保存在 `%LOCALAPPDATA%\BiliWatch`。免安装不表示运行时不会生成缓存文件。
+
+### 从源码运行
+
 在 **Windows x64** 上安装 Git 和 **.NET 8 SDK**，然后执行：
 
 ```powershell
@@ -41,11 +51,11 @@ cd BiliWatch
 dotnet run --project BiliWatch.App/BiliWatch.App.csproj -c Release
 ```
 
-如果已有 `BiliWatch-win-x64.zip`，完整解压后双击 `BiliWatch.exe` 即可；发布包自带运行时，无需另装 .NET。自行生成发布包的方法见[从源码构建](#从源码构建)。
+自行生成单文件程序的方法见[从源码构建](#从源码构建)。
 
 ## 使用方法
 
-1. 将 `BiliWatch-win-x64.zip` 完整解压到一个文件夹，双击 `BiliWatch.exe`。不要只把 EXE 单独移走。
+1. 从 Releases 下载 `BiliWatch.exe`，双击运行。
 2. 点击右上角“扫码登录”，用哔哩哔哩手机 App 扫一扫并确认。二维码过期后可以刷新。
 3. 点击“开始查询”。程序先获取主播名单，再逐个查询；请求起始间隔至少 1 秒，数百位主播需要数分钟。
 4. 可随时“取消”，然后使用“继续待查询项”。“重试失败项”只重试本轮失败的主播，不会重复累加成功结果。
@@ -73,11 +83,10 @@ dotnet run --project BiliWatch.App/BiliWatch.App.csproj -c Release
 ```powershell
 dotnet build BiliWatch.App/BiliWatch.App.csproj -c Release
 dotnet run --project BiliWatch.Tests/BiliWatch.Tests.csproj -c Release
-dotnet publish BiliWatch.App/BiliWatch.App.csproj -c Release -r win-x64 --self-contained true -o publish/BiliWatch
-Compress-Archive -Path publish/BiliWatch -DestinationPath publish/BiliWatch-win-x64.zip -Force
+dotnet publish BiliWatch.App/BiliWatch.App.csproj -c Release -p:PublishProfile=Portable -o publish/BiliWatch
 ```
 
-分发时请保留 QRCoder 和 .NET / WPF 运行时的许可证及第三方声明文件。
+输出为 `publish/BiliWatch/BiliWatch.exe` 一个文件。发布配置保存在 `BiliWatch.App/Properties/PublishProfiles/Portable.pubxml`，启用自带运行时、单文件和压缩；WPF 不做裁剪。QRCoder 和 .NET / WPF 的许可证及第三方声明见 [THIRD-PARTY-NOTICES.txt](THIRD-PARTY-NOTICES.txt)，也作为资源内置于 EXE。
 
 默认中间产物放在源码目录 `.artifacts`。可通过环境变量 `BILIWATCH_BUILD_ROOT` 指定另一绝对目录（需带末尾反斜杠）。`BILIWATCH_DATA_DIR` 可覆盖本机数据目录，便于隔离测试。不得把真实登录凭据提交进源码或测试夹具。
 

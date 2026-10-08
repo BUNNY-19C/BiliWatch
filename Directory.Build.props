@@ -3,6 +3,7 @@
     <TargetFramework>net8.0-windows</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <DebugType Condition="'$(Configuration)' == 'Release'">embedded</DebugType>
     <BILIWATCH_BUILD_ROOT Condition="'$(BILIWATCH_BUILD_ROOT)' == ''">$(MSBuildThisFileDirectory).artifacts\</BILIWATCH_BUILD_ROOT>
     <BaseOutputPath>$(BILIWATCH_BUILD_ROOT)$(MSBuildProjectName)\bin\</BaseOutputPath>
     <BaseIntermediateOutputPath>$(BILIWATCH_BUILD_ROOT)$(MSBuildProjectName)\obj\</BaseIntermediateOutputPath>
